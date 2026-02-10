@@ -82,6 +82,19 @@ Com o servidor rodando, acesse:
     │   └── character_router.py             # Endpoints FastAPI
     ├── service/
     │   └── character_service.py            # Regras de negócio
-    └── repository/
-        └── character_repository.py         # Acesso a dados
+    ├── repository/
+    │   └── character_repository.py         # Acesso a dados
+    └── exceptions/
+        └── character_exception.py          # Exceção de domínio
+└── tests/
+    └── character/
+        └── test_character_service.py       # Testes unitários do service
+```
+
+## Testes unitários
+
+Os testes focam na camada de **service**, onde vivem as regras de negócio. O repository é mockado para isolar a lógica.
+
+```bash
+pytest tests/ -v
 ```

@@ -10,7 +10,7 @@ class CharacterService:
         self.repository = repository
 
     def create(self, data: CreateCharacterSchema) -> Character:
-        if data.health_points <= 0:
+        if data.health_points < 0:
             raise CharacterException("health_points must be greater than 0")
 
         character = Character(

@@ -25,6 +25,7 @@ Propriedades da entidade:
 - PostgreSQL (via Docker)
 - Pydantic para schemas/DTOs
 - pydantic-settings para configuração (.env)
+- pytest para testes unitários
 
 ## Arquitetura
 Separação por domínio com camadas explícitas (inspirado em Clean Architecture simplificada).
@@ -34,9 +35,14 @@ Cada domínio segue a mesma estrutura de pastas:
 
 app.py # Entry point — FastAPI, exception handler global, registro de routers
 config.py # Settings via pydantic-settings (lê do .env)
-database.py # Engine, SessionLocal, Base, get_db (generator de session por request)
+database.py # Engine, SessionLocal, Base, get*db (generator de session por request)
 .env # DATABASE_URL
 requirements.txt # Dependências
+tests/
+├── **init**.py
+└── {{dominio}}/
+├── **init**.py
+└── test*{{dominio}}\_service.py # Testes unitários do service (pytest + MagicMock)
 common/
 ├── **init**.py
 └── api_response.py # ApiResponse[T] genérico — wrapper padrão de toda resposta
@@ -97,6 +103,14 @@ Response HTTP
 - O service lança exceções de domínio — nunca HTTPException (sem acoplamento com o framework HTTP).
 - O router captura a exceção de domínio e traduz para HTTPException com o status code adequado (ex: 400).
 - Isso mantém o service reutilizável fora do contexto HTTP (CLI, workers, scripts, etc.).
+
+### Testes unitários
+- Foco nos testes do service — é onde vivem as regras de negócio.
+- Pasta tests/ na root do projeto, espelhando a estrutura de domínios (tests/{{dominio}}/).
+- Usar pytest como runner e MagicMock (unittest.mock) para mockar o repository.
+- Fixtures do pytest injetam o mock_repository e o service nos testes (similar ao Depends do FastAPI).
+- Cada regra de negócio do service deve ter ao menos um teste de sucesso e um de falha.
+- Rodar com: pytest tests/ -v
 
 ### Status codes explícitos
 - POST   → 201 Created
