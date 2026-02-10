@@ -51,9 +51,12 @@ common/
 ├── service/
 │ ├── **init**.py
 │ └── {{dominio}}\_service.py # Regras de negócio — orquestra operações, converte schema → entidade
-└── repository/
+├── repository/
+│ ├── **init**.py
+│ └── {{dominio}}\_repository.py # Acesso a dados — CRUD via SQLAlchemy Session
+└── exceptions/
 ├── **init**.py
-└── {{dominio}}\_repository.py # Acesso a dados — CRUD via SQLAlchemy Session
+└── {{dominio}}\_exception.py # Exceção de domínio — lançada pelo service, capturada pelo router
 
 ```
 
@@ -88,6 +91,12 @@ Response HTTP
 - Factory get_service() no router monta a cadeia: Session → Repository → Service.
 - O repository recebe a Session do banco via construtor.
 - O service recebe o repository via construtor.
+
+### Exceções de domínio
+- Cada domínio tem sua própria exceção (ex: {{Dominio}}Exception) dentro de exceptions/.
+- O service lança exceções de domínio — nunca HTTPException (sem acoplamento com o framework HTTP).
+- O router captura a exceção de domínio e traduz para HTTPException com o status code adequado (ex: 400).
+- Isso mantém o service reutilizável fora do contexto HTTP (CLI, workers, scripts, etc.).
 
 ### Status codes explícitos
 - POST   → 201 Created
