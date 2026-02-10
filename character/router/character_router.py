@@ -10,6 +10,7 @@ from character.character_schema import (
 )
 from character.service.character_service import CharacterService
 from character.repository.character_repository import CharacterRepository
+from character.exceptions.character_exception import CharacterException
 
 router = APIRouter(prefix="/characters", tags=["Characters"])
 
@@ -28,7 +29,13 @@ def create_character(
     data: CreateCharacterSchema,
     service: CharacterService = Depends(get_service),
 ):
-    character = service.create(data)
+    try:
+        character = service.create(data)
+    except CharacterException as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=e.message,
+        )
     return ApiResponse(message="Character created", data=character)
 
 

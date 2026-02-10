@@ -1,5 +1,6 @@
 from character.character import Character
 from character.character_schema import CreateCharacterSchema, UpdateCharacterSchema
+from character.exceptions.character_exception import CharacterException
 from character.repository.character_repository import CharacterRepository
 
 
@@ -9,6 +10,9 @@ class CharacterService:
         self.repository = repository
 
     def create(self, data: CreateCharacterSchema) -> Character:
+        if data.health_points <= 0:
+            raise CharacterException("health_points must be greater than 0")
+
         character = Character(
             name=data.name,
             health_points=data.health_points,
